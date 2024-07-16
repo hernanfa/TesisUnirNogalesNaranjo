@@ -1,0 +1,405 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Terapias</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        .card {
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            background-color: #02B1F4;
+            color: #fff;
+        }
+
+        .card:hover .card-icon {
+            color: #fff;
+        }
+
+        .card-icon {
+            color: #02B1F4;
+            font-size: 4rem;
+            transition: color 0.3s;
+        }
+
+        .btn-scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #02B1F4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            display: none;
+            cursor: pointer;
+        }
+
+        .btn-scroll-top:hover {
+            background-color: #0197D4;
+        }
+
+        .bg-celeste {
+            background-color: #02B1F4;
+        }
+
+        .text-celeste {
+            color: #02B1F4;
+        }
+
+        .navbar .dropdown-menu {
+            background-color: rgba(2, 177, 244, 0.9);
+        }
+
+        .navbar .dropdown-menu .dropdown-item {
+            color: white;
+        }
+
+        .navbar .dropdown-menu .dropdown-item:hover {
+            background-color: #0197D4;
+        }
+
+        @media (max-width: 991.98px) {
+            .custom-navbar-collapse {
+                background-color: rgba(2, 177, 244, 0.9);
+            }
+            .custom-navbar-collapse .nav-link,
+            .custom-navbar-collapse .navbar-brand,
+            .custom-navbar-collapse .dropdown-item {
+                color: white !important;
+            }
+        }
+
+        .btn-custom {
+            font-size: 15px; /* Tamaño de fuente más pequeño */
+            padding: 1px 5px; /* Espaciado interior reducido */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="d-flex flex-column min-vh-100">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <a class="navbar-brand text-celeste" href="{% url 'TerapeutaOpciones' %}">
+                <img src="{% static 'imagenes/logoempresa.png' %}" alt="Logo" width="30" height="30" class="d-inline-block align-top">
+                Terapias
+            </a>
+            <button class="navbar-toggler custom-navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse custom-navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-celeste" href="{% url 'TerapeutaOpciones' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-celeste" href="#" id="navbarDropdownUsuarios" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Usuarios
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownUsuarios">
+                            <a class="dropdown-item" href="{% url 'pacientes' %}">Pacientes</a>
+                            {% if is_superuser %}
+                            <a class="dropdown-item" href="{% url 'fisioterapeutas' %}">Terapeutas</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-celeste" href="#" id="navbarDropdownGestion" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Gestión
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownGestion">
+                            <a class="dropdown-item" href="{% url 'rehabilitacion_paciente' %}">Rehabilitación</a>
+                            <a class="dropdown-item" href="{% url 'gestion_motivo' %}">Motivos</a>
+                            <a class="dropdown-item" href="{% url 'gestion_movimiento' %}">Movimientos</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-celeste" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-celeste text-white" href="#" data-toggle="modal" data-target="#logoutModal">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <br><br>
+        <div class="container flex-grow-1 mt-5">
+            <h2>Lista de Pacientes</h2>
+            <!-- Formulario de Búsqueda -->
+            <form method="get" action="{% url 'pacientes' %}" class="mb-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Buscar por cédula o nombre..." name="query" value="{{ request.GET.query }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="input-group-append">
+                        <a href="{% url 'pacientes' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-eraser"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#createModal">
+                <i class="fas fa-plus"></i> Crear Paciente
+            </button>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cédula</th>
+                            <th>Nombre Completo</th>
+                            <th>Celular</th>
+                            <th>Dirección</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if pacientes %}
+                            {% for paciente in pacientes %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ paciente.cedula }}</td>
+                                    <td>{{ paciente.nombre1 }} {{ paciente.nombre2 }} {{ paciente.apellido1 }} {{ paciente.apellido2 }}</td>
+                                    <td>{{ paciente.celular }}</td>
+                                    <td>{{ paciente.direccion }}</td>
+                                    <td>
+                                        <button class="btn btn-warning btn-custom" data-toggle="modal" data-target="#updateModal-{{ paciente.cedula }}">
+                                            <i class="fas fa-edit"></i> Actualizar
+                                        </button>
+                                        <button class="btn btn-danger btn-custom" data-toggle="modal" data-target="#deleteModal-{{ paciente.cedula }}">
+                                            <i class="fas fa-trash-alt"></i> Eliminar
+                                        </button>
+                                        <a href="{% url 'gestion_paciente' paciente.cedula %}" class="btn btn-primary btn-custom">
+                                            <i class="fas fa-procedures"></i> Rehabilitaciones
+                                        </a>
+                                        <a href="{% url 'nuevo_reporte_paciente' paciente.cedula %}" class="btn btn-primary btn-custom">
+                                            <i class="fas fa-chart-line"></i> Ver Reporte
+                                        </a>
+                                    </td>
+                                    
+                                    
+                                </tr>
+
+                                <!-- Update Modal -->
+                                <div class="modal fade" id="updateModal-{{ paciente.cedula }}" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="updateModalLabel">Actualizar Paciente</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="post" action="{% url 'pacientes' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="cedula" value="{{ paciente.cedula }}">
+                                                    <input type="hidden" name="update" value="1">
+                                                    <div class="form-group">
+                                                        <label for="nombre1">Nombre 1:</label>
+                                                        <input type="text" class="form-control" name="nombre1" value="{{ paciente.nombre1 }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="nombre2">Nombre 2:</label>
+                                                        <input type="text" class="form-control" name="nombre2" value="{{ paciente.nombre2 }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="apellido1">Apellido 1:</label>
+                                                        <input type="text" class="form-control" name="apellido1" value="{{ paciente.apellido1 }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="apellido2">Apellido 2:</label>
+                                                        <input type="text" class="form-control" name="apellido2" value="{{ paciente.apellido2 }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="celular">Celular:</label>
+                                                        <input type="number" oninput="limitarLongitud(this, 10)" class="form-control" name="celular" value="{{ paciente.celular }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="direccion">Dirección:</label>
+                                                        <input type="text" class="form-control" name="direccion" value="{{ paciente.direccion }}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="email">Email:</label>
+                                                        <input type="email" class="form-control" name="email" value="{{ paciente.email }}">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-save"></i> Guardar cambios
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal-{{ paciente.cedula }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Eliminar Paciente</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Está seguro que desea eliminar a {{ paciente.nombre1 }} {{ paciente.apellido1 }}?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form method="post" action="{% url 'pacientes' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="cedula" value="{{ paciente.cedula }}">
+                                                    <input type="hidden" name="delete" value="1">
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    <i class="fas fa-times"></i> Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7">No se encontraron pacientes con los criterios ingresados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-celeste text-center text-lg-start mt-5 py-3">
+        <div class="container p-4">
+            <div class="row">
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <h4 class="text-uppercase text-white">Síguenos en nuestras redes sociales!</h4>
+                    <a href="#"><img src="{% static 'imagenes/facebook.png' %}" alt="Facebook" width="70" height="70" /></a>
+                    <a href="#"><img src="{% static 'imagenes/twitter.png' %}" alt="Twitter" width="92" height="92" /></a>
+                    <a href="#"><img src="{% static 'imagenes/instagram.png' %}" alt="Instagram" width="110" height="80" /></a>
+                </div>
+                <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                    <p class="text-white">&copy; 2024 Terapias. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal: Cerrar Sesión -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">¿Listo para salir?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">Selecciona "Cerrar Sesión" a continuación si estás listo para finalizar tu sesión actual.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-primary" href="{% url 'logout' %}">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Crear Paciente -->
+    <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalLabel">Crear Paciente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'pacientes' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="create" value="1">
+                        <div class="form-group">
+                            <label for="cedula">Cédula:</label>
+                            <input type="number" class="form-control" name="cedula">
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre1">Nombre 1:</label>
+                            <input type="text" class="form-control" name="nombre1">
+                        </div>
+                        <div class="form-group">
+                            <label for="nombre2">Nombre 2:</label>
+                            <input type="text" class="form-control" name="nombre2">
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido1">Apellido 1:</label>
+                            <input type="text" class="form-control" name="apellido1">
+                        </div>
+                        <div class="form-group">
+                            <label for="apellido2">Apellido 2:</label>
+                            <input type="text" class="form-control" name="apellido2">
+                        </div>
+                        <div class="form-group">
+                            <label for="celular">Celular:</label>
+                            <input type="number" oninput="limitarLongitud(this, 10)" class="form-control" name="celular">
+                        </div>
+                        <div class="form-group">
+                            <label for="direccion">Dirección:</label>
+                            <input type="text" class="form-control" name="direccion">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" name="email">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function limitarLongitud(input, maxLength) {
+            if (input.value.length > maxLength) {
+                input.value = input.value.slice(0, maxLength);
+            }
+        }
+    </script>
+</body>
+</html>

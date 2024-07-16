@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Terapias</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        .card {
+            transition: transform 0.3s, background-color 0.3s, color 0.3s;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 10px;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            background-color: #02B1F4;
+            color: #fff;
+        }
+
+        .card:hover .card-icon {
+            color: #fff;
+        }
+
+        .card-icon {
+            color: #02B1F4;
+            font-size: 4rem;
+            transition: color 0.3s;
+        }
+
+        .btn-scroll-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #02B1F4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            display: none;
+            cursor: pointer;
+        }
+
+        .btn-scroll-top:hover {
+            background-color: #0197D4;
+        }
+
+        .bg-celeste {
+            background-color: #02B1F4;
+        }
+
+        .text-celeste {
+            color: #02B1F4;
+        }
+
+        .navbar .dropdown-menu {
+            background-color: rgba(2, 177, 244, 0.9);
+        }
+
+        .navbar .dropdown-menu .dropdown-item {
+            color: white;
+        }
+        .custom-navbar-collapse .nav-link {
+            color:#00aaff !important;
+        }
+
+        /* Hacer que el botón de cerrar sesión también tenga letras blancas */
+        .custom-navbar-collapse .btn-celeste {
+            color: white !important;
+        }
+        .navbar .dropdown-menu .dropdown-item:hover {
+            background-color: #ffffff;
+        }
+
+        @media (max-width: 991.98px) {
+    tom-navbar-collapse .nav-link,
+            .custom-navbar-collapse .navbar-brand,
+            .custom-navbar-collapse .dropdown-item {
+                color: white !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex flex-column min-vh-100">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <a class="navbar-brand text-celeste" href="{% url 'TerapeutaOpciones' %}">
+                <img src="{% static 'imagenes/logoempresa.png' %}" alt="Logo" width="30" height="30" class="d-inline-block align-top">
+                Terapias
+            </a>
+            <button class="navbar-toggler custom-navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse custom-navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-celeste" href="{% url 'TerapeutaOpciones' %}">Inicio</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-celeste" href="#" id="navbarDropdownUsuarios" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Usuarios
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownUsuarios">
+                            <a class="dropdown-item" href="{% url 'pacientes' %}">Pacientes</a>
+                            {% if is_superuser %}
+                            <a class="dropdown-item" href="{% url 'fisioterapeutas' %}">Terapeutas</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                 
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-celeste" href="#" id="navbarDropdownGestion" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Gestión
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownGestion">
+                            <a class="dropdown-item" href="{% url 'rehabilitacion_paciente' %}">Rehabilitación</a>
+                            <a class="dropdown-item" href="{% url 'gestion_motivo' %}">Motivos</a>
+                            <a class="dropdown-item" href="{% url 'gestion_movimiento' %}">Movimientos</a>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-celeste" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-celeste text-white" href="#" data-toggle="modal" data-target="#logoutModal">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <br><br>
+
+        <div class="container mt-5 pt-5">
+            <h1 class="text-center text-celeste mb-4">¿Qué deseas realizar?</h1>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-user-md card-icon"></i>
+                            <h5 class="card-title mt-3">Gestión de Rehabilitacion</h5>
+                            <p class="card-text">Administra las rehabilitaciones disponibles.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'rehabilitacion_paciente' %}" class="btn btn-outline-celeste btn-block">Gestionar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users card-icon"></i>
+                            <h5 class="card-title mt-3">Gestión de Pacientes</h5>
+                            <p class="card-text">Administra los pacientes registrados.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'pacientes' %}" class="btn btn-outline-celeste btn-block">Gestionar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-chart-bar card-icon"></i>
+                            <h5 class="card-title mt-3">Ver Reportes</h5>
+                            <p class="card-text">Consulta reportes y estadísticas.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'dashboard' %}" class="btn btn-outline-celeste btn-block">Observar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-book card-icon"></i>
+                            <h5 class="card-title mt-3">Gestión de Motivos de Rehabilitación</h5>
+                            <p class="card-text">Administra los motivos de rehabilitación registrados.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'gestion_motivo' %}" class="btn btn-outline-celeste btn-block">Gestionar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-dumbbell card-icon"></i>
+                            <h5 class="card-title mt-3">Gestión de Movimientos de Rehabilitación</h5>
+                            <p class="card-text">Administra los movimientos de rehabilitación registrados.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'gestion_movimiento' %}" class="btn btn-outline-celeste btn-block">Gestionar</a>
+                        </div>
+                    </div>
+                </div>
+                {% if is_superuser %}
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-user card-icon"></i>
+                            <h5 class="card-title mt-3">Gestión de Terapeutas</h5>
+                            <p class="card-text">Administra los terapeutas registrados.</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'fisioterapeutas' %}" class="btn btn-outline-celeste btn-block">Gestionar</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <br><br><br><br><br><br>
+
+        <footer class="bg-celeste text-center text-lg-start mt-5 py-3">
+            <div class="container p-4">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                        <h4 class="text-uppercase text-white">Síguenos en nuestras redes sociales!</h4>
+                        <a href="#"><img src="{% static 'imagenes/facebook.png' %}" alt="Facebook" width="70" height="70" /></a>
+                        <a href="#"><img src="{% static 'imagenes/twitter.png' %}" alt="Twitter" width="92" height="92" /></a>
+                        <a href="#"><img src="{% static 'imagenes/instagram.png' %}" alt="Instagram" width="110" height="80" /></a>
+                    </div>
+                    <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                        <p class="text-white">&copy; 2024 Terapias. Todos los derechos reservados.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logoutModalLabel">¿Listo para salir?</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Selecciona "Cerrar Sesión" a continuación si estás listo para finalizar tu sesión actual.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                        <a class="btn btn-primary" href="{% url 'logout' %}">Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-scroll-top" onclick="scrollToTop()">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js"></script>
+        <script>
+            window.onscroll = function () {
+                const btnScrollTop = document.querySelector(".btn-scroll-top");
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                    btnScrollTop.style.display = "block";
+                } else {
+                    btnScrollTop.style.display = "none";
+                }
+            };
+
+            function scrollToTop() {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }
+        </script>
+    </div>
+</body>
+</html>
